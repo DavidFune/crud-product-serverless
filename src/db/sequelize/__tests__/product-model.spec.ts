@@ -6,8 +6,6 @@ describe('Product Model Unit Test', () => {
 
     const {sequelize} = setupSequelize({ models: [ProductModel] });
 
-    beforeEach(async () => await sequelize.sync());
-
     it('should create product', async() => {
         const product_values = {
             name: 'Mouse-Usb-03',
