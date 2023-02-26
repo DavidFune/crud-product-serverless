@@ -1,5 +1,5 @@
 {
-  "name": "crud-project-serverless",
+  "name": "crud-product-serverless",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
