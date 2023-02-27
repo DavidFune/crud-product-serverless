@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { post_product } from './product/product';
+import { get_by_id_product, post_product } from './product/product';
 const res = require("../../events/event.json");
 
 describe('Product test the http methodos', () => {
@@ -24,6 +24,18 @@ describe('Product test the http methodos', () => {
         }
 
         const result = await post_product(event);
+        expect(result.statusCode).toEqual(200);
+    });
+
+    it('should get by id product', async () => {
+
+        const event = { 
+            httpMethod: 'GET', 
+            pathParameters: { 
+                product_id: '18' 
+            } 
+        } 
+        const result = await get_by_id_product(event as any);
         expect(result.statusCode).toEqual(200);
     });
 });
