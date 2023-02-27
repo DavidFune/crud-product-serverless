@@ -1,0 +1,99 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  crud-product-serverless
+
+  Sample SAM Template for crud-product-serverless
+  
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Parametrs:
+  DBVendor:
+    type: String
+    Default: postgres
+  DBHost:
+    type: String
+    Default: localhost
+  Port:
+    type: String
+    Default: "5432"
+  User:
+    type: String
+    Default: "postgres"
+  Password:
+    type: String
+    Default: "postgres"
+  DBLogging:
+    type: String
+    Default: "false"
+  StageName:
+    type: String
+    Default: "Dev"
+
+Globals:
+  Function:
+    Timeout: 3
+    Environment:
+      Variables:
+        DB_VENDOR: !Ref DBVendor
+        DB_HOST: !Ref DBHost
+        PORT: !Ref Port
+        USER: !Ref User
+        PASSWORD: !Ref Password
+        DB_LOGGING: !Ref DBLogging
+        STAGE_NAME: !Ref StageName
+    Tracing: Active
+  Api:
+    TracingEnabled: True
+  
+
+Resources:
+  PostProductFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/handlers/product/
+      Handler: product.post_product
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      Events:
+        PostProduct:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /products
+            Method: post
+  GetProductsFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/handlers/product/
+      Handler: product.get_product
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      Events:
+        GetProducts:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /products
+            Method: get
+  GetByIdProductFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/handlers/product/
+      Handler: product.get_by_id_product
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      Events:
+        GetByIdProducts:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /products/{product_id}
+            Method: get
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  ProductApi:
+    Description: "API Gateway endpoint URL for Prod stage for Product function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/product/"

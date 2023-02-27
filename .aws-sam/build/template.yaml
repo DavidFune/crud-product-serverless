@@ -1,0 +1,90 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: |
+  crud-product-serverless
+  Sample SAM Template for crud-product-serverless
+Parametrs:
+  DBVendor:
+    type: String
+    Default: postgres
+  DBHost:
+    type: String
+    Default: localhost
+  Port:
+    type: String
+    Default: "5432"
+  User:
+    type: String
+    Default: postgres
+  Password:
+    type: String
+    Default: postgres
+  DBLogging:
+    type: String
+    Default: "false"
+  StageName:
+    type: String
+    Default: Dev
+Globals:
+  Function:
+    Timeout: 3
+    Environment:
+      Variables:
+        DB_VENDOR: !Ref DBVendor
+        DB_HOST: !Ref DBHost
+        PORT: !Ref Port
+        USER: !Ref User
+        PASSWORD: !Ref Password
+        DB_LOGGING: !Ref DBLogging
+        STAGE_NAME: !Ref StageName
+    Tracing: Active
+  Api:
+    TracingEnabled: true
+Resources:
+  PostProductFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: PostProductFunction
+      Handler: app.post_product
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      Events:
+        PostProduct:
+          Type: Api
+          Properties:
+            Path: /products
+            Method: post
+  GetProductsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: GetProductsFunction
+      Handler: app.get_product
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      Events:
+        GetProducts:
+          Type: Api
+          Properties:
+            Path: /products
+            Method: get
+  GetByIdProductFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: GetByIdProductFunction
+      Handler: app.get_by_id_product
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      Events:
+        GetByIdProducts:
+          Type: Api
+          Properties:
+            Path: /products/{product_id}
+            Method: get
+Outputs:
+  ProductApi:
+    Description: API Gateway endpoint URL for Prod stage for Product function
+    Value: !Sub >-
+      https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/product/
