@@ -13,11 +13,11 @@ module.exports = {
     devtool: 'source-map',
     resolve: {
         extensions: ['.ts', '.js']
-    },
+},
     target: 'node',
-    mode: process.env.NODE_ENV || 'development',
-    module: {
-        rules: [{ test: /\.tsx?$/, loader: 'ts-loader' }]
-    },
-    plugins: [awsSamPlugin]
+        mode: process.env.NODE_ENV || 'development',
+            module: {
+    rules: [{ test: /\.tsx?$/, loader: 'ts-loader' }]
+},
+plugins: [awsSamPlugin]
 };

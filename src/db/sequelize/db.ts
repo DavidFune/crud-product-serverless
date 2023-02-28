@@ -1,3 +1,4 @@
+require('sequelize')
 import { Sequelize, SequelizeOptions } from "sequelize-typescript";
 import { configDB as config } from "./config";
 

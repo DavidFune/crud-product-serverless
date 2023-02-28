@@ -6,6 +6,11 @@ Description: >
   Sample SAM Template for crud-product-serverless
   
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+phases:
+  install:
+    commands:
+      - npm install
+      
 Parametrs:
   DBVendor:
     type: String
