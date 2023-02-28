@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack')
 const AwsSamPlugin = require('aws-sam-webpack-plugin');
 
 const awsSamPlugin = new AwsSamPlugin();
@@ -19,5 +20,8 @@ module.exports = {
             module: {
     rules: [{ test: /\.tsx?$/, loader: 'ts-loader' }]
 },
-plugins: [awsSamPlugin]
+plugins: [
+    awsSamPlugin,
+    new webpack.IgnorePlugin({ resourceRegExp: /^pg-native$/ })
+]
 };
