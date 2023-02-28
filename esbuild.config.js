@@ -2,7 +2,7 @@ const esbuild = require('esbuild')
 const esbuildPluginTsc = require('esbuild-plugin-tsc');
 const glob = require("tiny-glob");
 ( async () => {
-    let entryPoints = await glob("./src/*.ts");
+    let entryPoints = await glob("./src/**/*.ts");
     esbuild.build({
         entryPoints,
         outdir: 'dist',
