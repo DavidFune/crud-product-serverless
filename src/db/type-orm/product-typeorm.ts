@@ -1,27 +1,57 @@
-import { Entity, Column, PrimaryColumn,  } from "typeorm"
+import { Entity, Column, PrimaryColumn, CreateDateColumn, Repository } from "typeorm"
+import { v4 as uuid } from "uuid";
+import { RepositoryInterface } from "../../repository/repository-contracts";
 
-export namespace ProductSequelize {
-    type ProductModelProps = {
-        id?: number;
+export namespace ProductTypeorm{
+    @Entity({schema: "store", name: "products"})
+    export class ProductModel{
+        
+        @PrimaryColumn('uuid')
+        id?: string;
+        
+        @Column('varchar', {nullable: false})
         name: string
+        
+        @Column('numeric',{nullable: false})
         price: number
-        description: string | null
+        
+        @Column('varchar',{nullable: true})
+        description: string
+    
+        @CreateDateColumn()
+        created_at: Date
+        
+        constructor(){
+            if (!this.id) {
+                this.id = uuid();
+            }
+        }
     }
 
-    @Entity({ name: "products"})
-    export class ProductModel <ProductModelProps>{
-        @PrimaryColumn()
-        @Column({nullable: false})
-        declare id?: number;
-        
-        @Column({nullable: false})
-        declare name: string
-        
-        @Column({nullable: false})
-        declare price: number
-        
-        @Column({nullable: true})
-        declare description: string
+    export class ProductRepository implements RepositoryInterface<ProductModel> {
 
+        constructor(private repo: Repository<ProductModel>){}
+
+        async insert(entity: ProductModel): Promise<void> {
+            const p = this.repo.create(entity)
+            await this.repo.save(p)
+        }
+        async findById(id: string): Promise<ProductModel> {
+            const p =  this.repo.findOneBy({id})
+            return p
+        }
+        async findAll(): Promise<ProductModel[]> {
+            const items =  await this.repo.find()
+            return items
+        }
+        async update(entity: ProductModel): Promise<void> {
+            const p = this.repo.create(entity)
+            await this.repo.save(p)
+        }
+        async delete(id: string): Promise<void> {
+            await this.repo.delete(id)
+        }
+        
     }
+
 }

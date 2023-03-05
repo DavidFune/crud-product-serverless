@@ -4,7 +4,7 @@
     "module": "commonjs",
     "sourceMap": true,
     "esModuleInterop": true,
-    "strict": true,
+    "strict": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "skipLibCheck": true,

@@ -10,7 +10,8 @@ type Config = {
         schema?: string,
         username?: string,
         password?: string,
-        migrations: any
+        migrations?: any
+        entities?: any
     }
 }
 
@@ -27,7 +28,8 @@ function makeConfig(envFile): Config {
                 port: process.env.TYPEORM_PORT as any,
                 username: process.env.TYPEORM_USERNAME,
                 schema: process.env.TYPEORM_SCHEMA,
-                migrations: [process.env.TYPEORM_MIGRATIONS]
+                migrations: [process.env.TYPEORM_MIGRATIONS],
+                entities: [process.env.TYPEORM_ENTITIES]
             }
         }
 
@@ -41,8 +43,8 @@ function makeConfig(envFile): Config {
                 port: output.parsed.TYPEORM_PORT as any,
                 username: output.parsed.TYPEORM_USERNAME,
                 schema: output.parsed.TYPEORM_SCHEMA,
-                migrations: [output.parsed.TYPEORM_MIGRATIONS]
-
+                migrations: [output.parsed.TYPEORM_MIGRATIONS],
+                entities: [output.parsed.TYPEORM_ENTITIES]
             }
         }
     }
