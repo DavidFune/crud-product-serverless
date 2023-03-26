@@ -16,14 +16,17 @@ export namespace ProductTypeorm{
         price: number
         
         @Column('varchar',{nullable: true})
-        description: string
+        description?: string
     
         @CreateDateColumn()
-        created_at: Date
+        created_at?: Date
         
         constructor(){
             if (!this.id) {
                 this.id = uuid();
+            }
+            if (!this.created_at) {
+                this.created_at = new Date();
             }
         }
     }
