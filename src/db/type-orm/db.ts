@@ -4,4 +4,10 @@ import { configDB as config } from "./config";
 
 const dataSourceOptions: DataSourceOptions = config.db
 
-export const PostgresDataSource = new DataSource(dataSourceOptions)
+export function setupPostgres (options: {}) {
+
+    return new DataSource({
+        ...dataSourceOptions,
+        ...options
+    })
+}

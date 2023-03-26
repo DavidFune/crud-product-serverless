@@ -1,13 +1,17 @@
-import { PostgresDataSource } from "../db";
-import { ProductModel } from "../product-typeorm";
- 
+import { setupPostgres } from "../db";
+import { ProductTypeorm } from "../product-typeorm";
+
+const {ProductModel} = ProductTypeorm
+
 describe('Product Model Unit Test TypeOrm',() => {
      
     it('should create product', async() => {
 
-        await PostgresDataSource.initialize()
+        const dataSource = setupPostgres({ entities: [ProductModel]})
+
+        await dataSource.initialize() 
         
-        const repo =  PostgresDataSource.getRepository(ProductModel)
+        const repo =  dataSource.getRepository(ProductModel)
 
         const product_values = {
             name: 'Mouse-Usb-04',
@@ -16,22 +20,21 @@ describe('Product Model Unit Test TypeOrm',() => {
         }
         
         const product = repo.create(product_values)
-        await repo.save(product)
+        const product_save = await repo.save(product)
         
-        console.log(product);
-        
+        expect(product_save.name).toBe(product_values.name)
     });
 
     it('should get products', async() => {
         
-        const datasource = PostgresDataSource
+        const dataSource = setupPostgres({ entities: [ProductModel]})
 
-        console.log(datasource.options)
-        /* const repo =  datasource.getRepository(ProductModel)
-        
+        await dataSource.initialize()
+
+        const repo = dataSource.getRepository(ProductModel)
+
         const products = await repo.find()
-        
-        console.log(products); */
-        
+
+        expect(products?.length).not.toBe(0)
     });
 });

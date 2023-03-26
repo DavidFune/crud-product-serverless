@@ -27,9 +27,8 @@ function makeConfig(envFile): Config {
                 password: process.env.TYPEORM_PASSWORD,
                 port: process.env.TYPEORM_PORT as any,
                 username: process.env.TYPEORM_USERNAME,
-                schema: process.env.TYPEORM_SCHEMA,
-                migrations: process.env.TYPEORM_MIGRATIONS_DIR,
-                entities: process.env.TYPEORM_ENTITIES            }
+                schema: process.env.TYPEORM_SCHEMA     
+            }
         }
 
     } else {
@@ -41,9 +40,7 @@ function makeConfig(envFile): Config {
                 password: output.parsed.TYPEORM_PASSWORD,
                 port: output.parsed.TYPEORM_PORT as any,
                 username: output.parsed.TYPEORM_USERNAME,
-                schema: output.parsed.TYPEORM_SCHEMA,
-                migrations: process.env.TYPEORM_MIGRATIONS_DIR,
-                entities: process.env.TYPEORM_ENTITIES  
+                schema: output.parsed.TYPEORM_SCHEMA
             }
         }
     }
