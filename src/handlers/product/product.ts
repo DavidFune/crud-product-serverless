@@ -1,9 +1,10 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { setupSequelize } from '../../db/sequelize/db';
-import { ProductSequelize } from '../../db/sequelize/product-sequelize';
+import { PostgresDataSource } from '../../db/type-orm/db';
+import { ProductTypeorm } from '../../db/type-orm/product-typeorm';
 
 
-const { ProductModel } = ProductSequelize
+const {ProductModel} = ProductTypeorm 
+
 
 export const post_product = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 
@@ -13,21 +14,22 @@ export const post_product = async (event: APIGatewayProxyEvent): Promise<APIGate
         throw new Error(`getMethod only accept POST method, you tried: ${event.httpMethod}`);
     }
 
-    setupSequelize({ models: [ProductModel] });
+    await PostgresDataSource.initialize()
+    const repo =  PostgresDataSource.getRepository(ProductModel)
 
     console.info('received:', event);
 
     const body = JSON.parse(event.body);
 
     try {
-        const product = await ProductModel.create(body.product)
+        const product = repo.create(body.product)
+        await repo.save(product)
 
         response = {
             statusCode: 200,
             body: JSON.stringify({
                 product: {
-                    ...product.toJSON(),
-                    price: parseFloat(product.toJSON().price as any)
+                    ...product,
                 }
             })
         }
@@ -50,20 +52,18 @@ export const get_product = async (event: APIGatewayProxyEvent): Promise<APIGatew
         throw new Error(`getMethod only accept GET method, you tried: ${event.httpMethod}`);
     }
 
-    setupSequelize({ models: [ProductModel] });
-
     console.info('received:', event);
 
+    await PostgresDataSource.initialize()
+    const repo =  PostgresDataSource.getRepository(ProductModel)
+
     try {
-        const products = await ProductModel.findAll()
+        const products = await repo.find()
 
         let list_products = []
 
         if (products.length > 0) {
-            products.forEach(product => list_products.push({
-                ...product.toJSON(),
-                price: parseFloat(product.toJSON().price as any)
-            }))
+            list_products = list_products
         }
 
         response = {
@@ -102,27 +102,22 @@ export const get_by_id_product = async (event: APIGatewayProxyEvent): Promise<AP
 
     const product_id = event.pathParameters.product_id;
 
-
-    setupSequelize({ models: [ProductModel] });
+    await PostgresDataSource.initialize()
+    const repo =  PostgresDataSource.getRepository(ProductModel)
 
     console.info('received:', event);
 
     try {
-        const product = await ProductModel.findOne({
+        const product = await repo.findOne({
             where: {
                 id: product_id
             }
         })
 
-        const _product = {
-            ...product.toJSON(),
-            price: parseFloat(product.toJSON().price as any)
-        }
-
         response = {
             statusCode: 200,
             body: JSON.stringify({
-                product: _product
+                product: product
             })
         }
 
@@ -144,25 +139,18 @@ export const put_product = async (event: APIGatewayProxyEvent): Promise<APIGatew
         throw new Error(`getMethod only accept PUT method, you tried: ${event.httpMethod}`);
     }
 
-    setupSequelize({ models: [ProductModel] });
+    await PostgresDataSource.initialize()
+    const repo =  PostgresDataSource.getRepository(ProductModel)
 
     console.info('received:', event);
 
     const body = JSON.parse(event.body);
 
-    try {
-        const product = await ProductModel.findOne({
-            where: {
-                id: body.product.id
-            }
-        })
-        product.set(body.product)
-        product.save()
+    const p_id = body.product.id
 
-        const _product = {
-            ...product.toJSON(),
-            price: parseFloat(product.toJSON().price as any)
-        }
+    try {
+        const product = await repo.update({id: p_id},{...body.product})
+
         response = {
             statusCode: 201,
             body: JSON.stringify({ message: 'update sucess' })
@@ -197,17 +185,13 @@ export const delete_product = async (event: APIGatewayProxyEvent): Promise<APIGa
 
     const product_id = event.pathParameters.product_id;
 
-
-    setupSequelize({ models: [ProductModel] });
+    await PostgresDataSource.initialize()
+    const repo =  PostgresDataSource.getRepository(ProductModel)
 
     console.info('received:', event);
 
     try {
-        await ProductModel.destroy({
-            where: {
-                id: product_id
-            }
-        })
+        await repo.delete(product_id)
 
         response = {
             statusCode: 201,

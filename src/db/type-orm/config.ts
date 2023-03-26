@@ -28,9 +28,8 @@ function makeConfig(envFile): Config {
                 port: process.env.TYPEORM_PORT as any,
                 username: process.env.TYPEORM_USERNAME,
                 schema: process.env.TYPEORM_SCHEMA,
-                migrations: [process.env.TYPEORM_MIGRATIONS],
-                entities: [process.env.TYPEORM_ENTITIES]
-            }
+                migrations: process.env.TYPEORM_MIGRATIONS_DIR,
+                entities: process.env.TYPEORM_ENTITIES            }
         }
 
     } else {
@@ -43,8 +42,8 @@ function makeConfig(envFile): Config {
                 port: output.parsed.TYPEORM_PORT as any,
                 username: output.parsed.TYPEORM_USERNAME,
                 schema: output.parsed.TYPEORM_SCHEMA,
-                migrations: [output.parsed.TYPEORM_MIGRATIONS],
-                entities: [output.parsed.TYPEORM_ENTITIES]
+                migrations: process.env.TYPEORM_MIGRATIONS_DIR,
+                entities: process.env.TYPEORM_ENTITIES  
             }
         }
     }
