@@ -13,7 +13,7 @@ describe('Product Repository Unit Test TypeOrm',() => {
     
     beforeEach( async () => {
         await dataSource.initialize()
-        repo = new StubProductRepository(dataSource.getRepository(ProductModel))
+        repo = new ProductRepository(dataSource.getRepository(ProductModel))
     })
 
     it('should create product', async() => {

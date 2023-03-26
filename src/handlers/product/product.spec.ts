@@ -32,7 +32,7 @@ describe('Product test the http methodos', () => {
         const event = { 
             httpMethod: 'GET', 
             pathParameters: { 
-                product_id: '18' 
+                product_id: '3c653ebe-d8e9-4ec6-977a-4d25d3d8b20d' 
             } 
         } 
         const result = await get_by_id_product(event as any);

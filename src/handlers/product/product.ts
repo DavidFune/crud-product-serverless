@@ -1,10 +1,12 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { PostgresDataSource } from '../../db/type-orm/db';
+import { setupPostgres } from '../../db/type-orm/db';
 import { ProductTypeorm } from '../../db/type-orm/product-typeorm';
 
 
-const {ProductModel} = ProductTypeorm 
+const {ProductModel, ProductRepository} = ProductTypeorm 
+const dataSource = setupPostgres({ entities: [ProductModel]})
 
+class Repository extends ProductRepository{}
 
 export const post_product = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 
@@ -14,22 +16,21 @@ export const post_product = async (event: APIGatewayProxyEvent): Promise<APIGate
         throw new Error(`getMethod only accept POST method, you tried: ${event.httpMethod}`);
     }
 
-    await PostgresDataSource.initialize()
-    const repo =  PostgresDataSource.getRepository(ProductModel)
+    await dataSource.initialize()
+    
+    const repo: Repository = new ProductRepository(dataSource.getRepository(ProductModel))
 
     console.info('received:', event);
 
     const body = JSON.parse(event.body);
 
     try {
-        const product = repo.create(body.product)
-        await repo.save(product)
-
+        await repo.insert(body.product)
         response = {
             statusCode: 200,
             body: JSON.stringify({
                 product: {
-                    ...product,
+                    ...body.product,
                 }
             })
         }
@@ -46,6 +47,9 @@ export const post_product = async (event: APIGatewayProxyEvent): Promise<APIGate
 
 export const get_product = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 
+    await dataSource.initialize() 
+    const repo: Repository = new ProductRepository(dataSource.getRepository(ProductModel))
+
     let response: APIGatewayProxyResult;
 
     if (event.httpMethod.toLocaleUpperCase() !== 'GET') {
@@ -54,11 +58,8 @@ export const get_product = async (event: APIGatewayProxyEvent): Promise<APIGatew
 
     console.info('received:', event);
 
-    await PostgresDataSource.initialize()
-    const repo =  PostgresDataSource.getRepository(ProductModel)
-
     try {
-        const products = await repo.find()
+        const products = await repo.findAll()
 
         let list_products = []
 
@@ -102,17 +103,13 @@ export const get_by_id_product = async (event: APIGatewayProxyEvent): Promise<AP
 
     const product_id = event.pathParameters.product_id;
 
-    await PostgresDataSource.initialize()
-    const repo =  PostgresDataSource.getRepository(ProductModel)
+    await dataSource.initialize() 
+    const repo: Repository = new ProductRepository(dataSource.getRepository(ProductModel))
 
     console.info('received:', event);
 
     try {
-        const product = await repo.findOne({
-            where: {
-                id: product_id
-            }
-        })
+        const product = await repo.findById(product_id)
 
         response = {
             statusCode: 200,
@@ -134,23 +131,20 @@ export const get_by_id_product = async (event: APIGatewayProxyEvent): Promise<AP
 export const put_product = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 
     let response: APIGatewayProxyResult;
+    
+    await dataSource.initialize() 
+    const repo: Repository = new ProductRepository(dataSource.getRepository(ProductModel))
 
     if (event.httpMethod.toLocaleUpperCase() !== 'PUT') {
         throw new Error(`getMethod only accept PUT method, you tried: ${event.httpMethod}`);
     }
-
-    await PostgresDataSource.initialize()
-    const repo =  PostgresDataSource.getRepository(ProductModel)
-
+    
     console.info('received:', event);
 
     const body = JSON.parse(event.body);
 
-    const p_id = body.product.id
-
     try {
-        const product = await repo.update({id: p_id},{...body.product})
-
+        await repo.update(body.product)
         response = {
             statusCode: 201,
             body: JSON.stringify({ message: 'update sucess' })
@@ -169,6 +163,8 @@ export const put_product = async (event: APIGatewayProxyEvent): Promise<APIGatew
 export const delete_product = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 
     let response: APIGatewayProxyResult;
+    await dataSource.initialize() 
+    const repo: Repository = new ProductRepository(dataSource.getRepository(ProductModel))
 
     if (event.httpMethod.toLocaleUpperCase() !== 'DELETE') {
         throw new Error(`getMethod only accept DELETE method, you tried: ${event.httpMethod}`);
@@ -184,9 +180,6 @@ export const delete_product = async (event: APIGatewayProxyEvent): Promise<APIGa
     }
 
     const product_id = event.pathParameters.product_id;
-
-    await PostgresDataSource.initialize()
-    const repo =  PostgresDataSource.getRepository(ProductModel)
 
     console.info('received:', event);
 
